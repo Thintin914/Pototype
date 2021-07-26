@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class Database : MonoBehaviour
 {
-    public bool isHandling = false;
+    public bool isHandling = false, isSelectedOption = false, isAllySelected = false;
+    public int selectedState = 0, selectedIndex = 0, selector = 0, selectedItem = 0;
     public GameObject c, s;
     public GameObject[] characterSprites;
     public List<GameObject> allyDetails;
@@ -60,11 +61,15 @@ public class Database : MonoBehaviour
 
     private void Start()
     {
-        AddCharacterToAllyList(100, 100, 10, 5, 2, 15, Character.Element.fire, 0);
+        AddCharacterToAllyList(100, 100, 10, 5, 8, 15, Character.Element.fire, 0);
         AddCharacterToAllyList(100, 100, 10, 5, 3, 15, Character.Element.water, 0);
         AddCharacterToAllyList(100, 100, 10, 5, 4, 15, Character.Element.earth, 0);
+        allyDetails[0].GetComponent<Character>().AddSkill(0);
+        allyDetails[0].GetComponent<Character>().AddSkill(1);
+        allyDetails[0].GetComponent<Character>().AddSkill(3);
 
-        AddCharacterToEnemyList(100, 100, 10, 5, 5, 15, Character.Element.fire, 0);
+
+        AddCharacterToEnemyList(20, 100, 10, 5, 5, 15, Character.Element.fire, 0);
         AddCharacterToEnemyList(100, 100, 10, 5, 6, 15, Character.Element.water, 0);
         AddCharacterToEnemyList(100, 100, 10, 5, 7, 15, Character.Element.earth, 0);
 

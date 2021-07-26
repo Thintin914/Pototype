@@ -9,6 +9,7 @@ public class Character : MonoBehaviour
     public Element element;
     public bool isAlly, isDead = false;
     public SceneCharacter sceneCharacter;
+    public List<int> skills;
 
     public void SetCharacter(int maxHP, int maxMP, int defense, int dodgeRate, int speed, int attackDamage, Element element, int ID)
     {
@@ -22,5 +23,10 @@ public class Character : MonoBehaviour
         this.attackDamage = attackDamage;
         this.element = element;
         this.ID = ID;
+    }
+
+    public void AddSkill(int skillID)
+    {
+        skills.Add(skillID);
     }
 }
