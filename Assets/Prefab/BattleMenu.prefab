@@ -99,11 +99,18 @@ MonoBehaviour:
   - {fileID: 21300004, guid: a5fb0f841e216b44c93fef3d1baf1ad6, type: 3}
   targetIcon: {fileID: 6472472558854597153, guid: 88e73338ff4e9d84da1952aadf0f9824,
     type: 3}
-  skillMenu: {fileID: 3443835700136813873, guid: ae38aa57e21ebec48a7fa783a5deb8d5,
+  skillMenu: {fileID: 1102293399191931799, guid: ae38aa57e21ebec48a7fa783a5deb8d5,
     type: 3}
+  itemMenu: {fileID: 3424124648451317466, guid: 7ab00e1ecafff7c42abb763ace3b9a28,
+    type: 3}
+  database: {fileID: 0}
   isShowing: 0
   isSelectedOption: 0
   isTargetAlly: 0
   isSelectedTarget: 0
+  isSelectedItem: 0
+  hasTargetIconCreated: 0
+  hasTargetRangeSet: 0
   currentOption: 0
   currentTarget: 0
+  currentItem: 0

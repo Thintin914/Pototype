@@ -5,26 +5,37 @@ using UnityEngine;
 public class TargetSelection : MonoBehaviour
 {
     public BattleMenu battleMenu;
+    private int previousIndex = 0;
+    private SpriteRenderer sr;
 
     private void Start()
     {
         transform.position = getPosition(battleMenu.isTargetAlly, battleMenu.currentTarget);
+        transform.position += new Vector3(0, 0, 1);
+        sr = GetComponent<SpriteRenderer>();
+        sr.sortingOrder = (int)transform.position.z * 1;
     }
 
     private void LateUpdate()
     {
-        transform.position = getPosition(battleMenu.isTargetAlly, battleMenu.currentTarget);
+        if (previousIndex != battleMenu.currentTarget)
+        {
+            transform.position = getPosition(battleMenu.isTargetAlly, battleMenu.currentTarget);
+            transform.position += new Vector3(0, 0, 1);
+        }
     }
 
+    // Can Add Vector2 Array To Act As Pivot Point, But No Need For Now.
     private Vector2 getPosition(bool isAlly, int index)
     {
+        previousIndex = index;
         if (isAlly)
         {
-            return new Vector2(-2 + index * -2, -2);
+            return battleMenu.database.allyDetails[index].GetComponent<Character>().sceneCharacter.transform.position;
         }
         else
         {
-            return new Vector2(2 + index * 2, -2);
+            return battleMenu.database.enemyDetails[index].GetComponent<Character>().sceneCharacter.transform.position;
         }
     }
 }

@@ -5,9 +5,9 @@ using UnityEngine;
 public class BattleMenu : MonoBehaviour
 {
     public Sprite[] battleOptions;
-    public GameObject targetIcon, skillMenu;
+    public GameObject targetIcon, skillMenu, itemMenu;
     private char targetRange = 'e';
-    private GameObject targetIconHolder, skillMenuHolder;
+    private GameObject targetIconHolder, skillMenuHolder, itemMenuHolder;
 
     public Database database;
     private SpriteRenderer sr;
@@ -89,6 +89,9 @@ public class BattleMenu : MonoBehaviour
                             skillMenuHolder.GetComponent<SkillMenu>().isDescription = false;
                             break;
                         case 3:
+                            itemMenuHolder = Instantiate(itemMenu);
+                            itemMenuHolder.GetComponent<ItemMenu>().battleMenu = this;
+                            itemMenuHolder.GetComponent<ItemMenu>().isDescription = false;
                             break;
                     }
                     isSelectedOption = true;
@@ -104,8 +107,16 @@ public class BattleMenu : MonoBehaviour
                     case 2://Skill
                         if(isSelectedItem == true)
                         {
-                            CreateTargetIcon();
                             getSkillTargetRange();
+                            CreateTargetIcon();
+                            selectTarget();
+                        }
+                        break;
+                    case 3://Item
+                        if (isSelectedItem == true)
+                        {
+                            getItemTargetRange(currentItem);
+                            CreateTargetIcon();
                             selectTarget();
                         }
                         break;
@@ -245,6 +256,48 @@ public class BattleMenu : MonoBehaviour
                     break;
                 case 9:
                     targetRange = 'e';
+                    break;
+            }
+            switch (targetRange)
+            {
+                case 's':
+                    isTargetAlly = true;
+                    currentTarget = database.selector;
+                    break;
+                case 'u':
+                case 'e':
+                    isTargetAlly = false;
+                    currentTarget = 0;
+                    break;
+                case 'a':
+                    isTargetAlly = true;
+                    currentTarget = 0;
+                    break;
+            }
+        }
+    }
+
+    private void getItemTargetRange(int scrolledPage)
+    {
+        if (hasTargetRangeSet == false)
+        {
+            hasTargetRangeSet = true;
+            switch (database.inventory[scrolledPage].ID)
+            {
+                case 0:
+                    targetRange = 'a';
+                    break;
+                case 1:
+                    targetRange = 'a';
+                    break;
+                case 2:
+                    targetRange = 'a';
+                    break;
+                case 3:
+                    targetRange = 'a';
+                    break;
+                case 4:
+                    targetRange = 'a';
                     break;
             }
             switch (targetRange)

@@ -147,12 +147,15 @@ MonoBehaviour:
   selectedState: 0
   selectedIndex: 0
   selector: 0
+  selectedItem: 0
   c: {fileID: 7154170433563052892, guid: 19172f2cf30900e46afc06c581420a54, type: 3}
   s: {fileID: 7230940492055697700, guid: 313d2559ea623c84e9da27501d7510fb, type: 3}
+  m: {fileID: 5024934819086138362, guid: ac9e1bb0d1ad0464397cf8ecea053690, type: 3}
   characterSprites:
   - {fileID: 7146561053583597744, guid: e269368df50279246ab6d82705bc6e0b, type: 3}
   allyDetails: []
   enemyDetails: []
+  inventory: []
 --- !u!4 &492979416
 Transform:
   m_ObjectHideFlags: 0

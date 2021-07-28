@@ -258,7 +258,10 @@ public class SceneCharacter : MonoBehaviour
                 performAttackPattern(0, -1, database.selectedIndex, false);
                 break;
             case 1:
-                Debug.Log("Caster: " + database.selector + ", Skill: " + database.selectedItem + ", Is Ally Side: " + database.isAllySelected + ", Target Index: " + database.selectedIndex);
+                Debug.Log("Caster: " + database.selector + ", Skill: " + database.allyDetails[database.selector].GetComponent<Character>().skills[database.selectedItem].skillName + ", Is Ally Side: " + database.isAllySelected + ", Target Index: " + database.selectedIndex);
+                break;
+            case 2:
+                Debug.Log("Caster: " + database.selector + ", Item: " + database.inventory[database.selectedItem].itemName + ", Is Ally Side: " + database.isAllySelected + ", Target Index: " + database.selectedIndex);
                 break;
         }
         StartCoroutine("playAnimation");

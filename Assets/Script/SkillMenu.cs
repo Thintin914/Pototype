@@ -11,7 +11,7 @@ public class SkillMenu : MonoBehaviour
     public int scroller = 0, descriptionID;
     public GameObject description1, description2;
     private SkillMenu skillMenu;
-    private List<int> skills;
+    private List<Skill> skills;
 
 
     private void Start()
@@ -36,17 +36,16 @@ public class SkillMenu : MonoBehaviour
         {
             transform.SetParent(GameObject.Find("SkillMenu(Clone)").transform);
             skillMenu = transform.parent.GetComponent<SkillMenu>();
-
             if (descriptionID + skillMenu.scroller < skills.Count)
             {
-                sr.sprite = skillSprites[skills[skillMenu.scroller] + descriptionID];
+                sr.sprite = skillSprites[skills[skillMenu.scroller].ID + descriptionID];
             }
             else
             {
                 Destroy(gameObject);
             }
 
-            if(descriptionID == 0)
+            if (descriptionID == 0)
             {
                 transform.position = (Vector2)transform.position + new Vector2(0, 0.75f);
             }
@@ -69,7 +68,7 @@ public class SkillMenu : MonoBehaviour
             }
             else
             {
-                sr.sprite = skillSprites[skills[skillMenu.scroller + descriptionID]];
+                sr.sprite = skillSprites[skills[temp].ID];
             }
         }
         else
@@ -95,7 +94,7 @@ public class SkillMenu : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.Z) && skills.Count != 0)
             {
-                battleMenu.currentItem = skills[scroller];
+                battleMenu.currentItem = skills[scroller].ID;
                 battleMenu.isSelectedItem = true;
                 Destroy(gameObject);
             }
