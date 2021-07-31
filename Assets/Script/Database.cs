@@ -6,7 +6,7 @@ public class Database : MonoBehaviour
 {
     public bool isHandling = false, isSelectedOption = false, isAllySelected = false;
     public int selectedState = 0, selectedIndex = 0, selector = 0, selectedItem = 0;
-    public GameObject c, s, m;
+    public GameObject c, s, i;
     public GameObject[] characterSprites;
     public List<GameObject> allyDetails;
     public List<GameObject> enemyDetails;
@@ -82,30 +82,10 @@ public class Database : MonoBehaviour
         }
     }
 
-    private void CreateMap(int sceneNumber)
-    {
-        GameObject temp = Instantiate(m, transform.position, Quaternion.identity);
-        SceneMap sm = temp.GetComponent<SceneMap>();
-        sm.sceneNumber = sceneNumber;
-        sm.isBackground = true;
-
-        temp = Instantiate(m, transform.position, Quaternion.identity);
-        sm = temp.GetComponent<SceneMap>();
-        sm.sceneNumber = sceneNumber;
-        sm.isBackground = false;
-        sm.foregroundID = 0;
-
-        temp = Instantiate(m, transform.position, Quaternion.identity);
-        sm = temp.GetComponent<SceneMap>();
-        sm.sceneNumber = sceneNumber;
-        sm.isBackground = false;
-        sm.foregroundID = 1;
-    }
-
     private void Start()
     {
-        AddCharacterToAllyList(100, 100, 10, 5, 8, 15, Character.Element.fire, 0);
-        AddCharacterToAllyList(100, 100, 10, 5, 3, 15, Character.Element.water, 0);
+        AddCharacterToAllyList(100, 100, 10, 5, 8, 15, Character.Element.wildfire, 0);
+        AddCharacterToAllyList(100, 100, 10, 5, 8, 15, Character.Element.water, 0);
         AddCharacterToAllyList(100, 100, 10, 5, 4, 15, Character.Element.earth, 0);
         allyDetails[0].GetComponent<Character>().AddSkill(new Skill(Character.Element.wind, 0, 10, "Dodge"));
         allyDetails[0].GetComponent<Character>().AddSkill(new Skill(Character.Element.wind, 1, 10, "AgainstTheCurrent"));
@@ -117,12 +97,11 @@ public class Database : MonoBehaviour
         AddCharacterToEnemyList(100, 100, 10, 5, 6, 15, Character.Element.water, 0);
         AddCharacterToEnemyList(100, 100, 10, 5, 7, 15, Character.Element.earth, 0);
 
-        //CreateMap(0);
         CreateAlly();
         CreateEnemy();
 
         AddItemToInventory("HP Potion", 10);
-        AddItemToInventory("MP Potion", 10);
+        AddItemToInventory("MP Potion", 5);
         AddItemToInventory("Strength Potion", 10);
         AddItemToInventory("Revive Potion", 10);
 

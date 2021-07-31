@@ -63,10 +63,10 @@
     <Compile Include="Assets\Script\BattleMenu.cs" />
     <Compile Include="Assets\Script\Character.cs" />
     <Compile Include="Assets\Script\Database.cs" />
+    <Compile Include="Assets\Script\ElementEffect.cs" />
     <Compile Include="Assets\Script\Item.cs" />
     <Compile Include="Assets\Script\ItemMenu.cs" />
     <Compile Include="Assets\Script\SceneCharacter.cs" />
-    <Compile Include="Assets\Script\SceneMap.cs" />
     <Compile Include="Assets\Script\Skill.cs" />
     <Compile Include="Assets\Script\SkillMenu.cs" />
     <Compile Include="Assets\Script\TargetSelection.cs" />

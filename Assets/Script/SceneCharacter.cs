@@ -8,30 +8,44 @@ public class SceneCharacter : MonoBehaviour
     public Character characterStats;
     public Database database;
     public Animator animator;
-    public SceneCharacter parent;
+    public SceneCharacter sceneCharacter, barCharacter;
     public SpriteRenderer myRenderer;
+    public int repeatRate = 0;
+    public float progress = 0;
 
-    private int standingPosition = 0;
-    private float progress = 0;
-    private GameObject sceneCharacter;
     private BattleMenu battleMenu;
     private static int speedBarLength = 16;
-    private int repeatRate = 0;
     private Shader shaderGUIText, shaderSpriteDefault;
+    private TMPro.TextMeshProUGUI HPIndicatorHolder;
 
     private void Start()
     {
         if (isBarCharacter == false)
         {
-            sceneCharacter = Instantiate(database.characterSprites[characterStats.ID], transform.position, Quaternion.identity);
-            sceneCharacter.transform.SetParent(transform);
-            animator = sceneCharacter.GetComponent<Animator>();
-            myRenderer = sceneCharacter.GetComponent<SpriteRenderer>();
+            GameObject cloner1 = Instantiate(database.characterSprites[characterStats.ID], transform.position, Quaternion.identity);
+            cloner1.transform.SetParent(transform);
+            animator = cloner1.GetComponent<Animator>();
+            myRenderer = cloner1.GetComponent<SpriteRenderer>();
 
-            GameObject cloner = Instantiate(gameObject);
-            cloner.GetComponent<SceneCharacter>().isBarCharacter = true;
-            cloner.name = "barIcon";
-            cloner.transform.SetParent(transform);
+            GameObject cloner2 = Instantiate(gameObject);
+            barCharacter = cloner2.GetComponent<SceneCharacter>();
+            barCharacter.isBarCharacter = true;
+            barCharacter.name = "barIcon";
+            barCharacter.transform.SetParent(transform);
+
+            HPIndicatorHolder = Instantiate(characterStats.textPrefab).GetComponent<TMPro.TextMeshProUGUI>();
+            HPIndicatorHolder.transform.position = transform.position;
+            HPIndicatorHolder.transform.position += new Vector3(1, -1.6f, 0);
+            HPIndicatorHolder.transform.SetParent(GameObject.Find("Canvas").transform);
+            if (characterStats.isAlly == true)
+            {
+                HPIndicatorHolder.text = "HP" + characterStats.currentHP + "\nMP" + characterStats.currentMP;
+            }
+            else
+            {
+                HPIndicatorHolder.text = "HP" + characterStats.currentHP;
+            }
+            HPIndicatorHolder.fontSize = 0.2f;
             if (tag == "Enemy")
             {
                 transform.rotation = Quaternion.Euler(0, -180, 0);
@@ -44,7 +58,7 @@ public class SceneCharacter : MonoBehaviour
             animator = transform.GetChild(0).GetComponent<Animator>();
             myRenderer = transform.GetChild(0).GetComponent<SpriteRenderer>();
             battleMenu = GameObject.Find("BattleMenu").GetComponent<BattleMenu>();
-            parent = transform.parent.GetComponent<SceneCharacter>();
+            sceneCharacter = transform.parent.GetComponent<SceneCharacter>();
         }
         shaderGUIText = Shader.Find("GUI/Text Shader");
         shaderSpriteDefault = Shader.Find("Sprites/Default");
@@ -81,8 +95,15 @@ public class SceneCharacter : MonoBehaviour
                     }
                     else
                     {
-                        progress += characterStats.speed * Time.deltaTime;
-                        transform.position = new Vector2(-8 + progress, 4);
+                            if (characterStats.speed + characterStats.extraSpeed > 0)
+                            {
+                                progress += (characterStats.speed + characterStats.extraSpeed) * Time.deltaTime;
+                            }
+                            else
+                            {
+                                progress += 1 * Time.deltaTime;
+                            }
+                            transform.position = new Vector2(-8 + progress, 4);
                     }
                 }
                 else
@@ -95,19 +116,9 @@ public class SceneCharacter : MonoBehaviour
             }
             else
             {
-                if (characterStats.isAlly == true)
-                {
-                    standingPosition = database.allyDetails.IndexOf(characterStats.gameObject);
-                    transform.position = new Vector2(-2 + standingPosition * -2, -2);
-                }
-                else
-                {
-                    standingPosition = database.enemyDetails.IndexOf(characterStats.gameObject);
-                    transform.position = new Vector2(2 + standingPosition * 2, -2);
-                }
-
                 if (characterStats.currentHP <= 0 && characterStats.isDead == false)
                 {
+                    HPIndicatorHolder.text = "Dead";
                     if (characterStats.isAlly == true)
                     {
                         database.allyDetails.Remove(characterStats.gameObject);
@@ -119,10 +130,15 @@ public class SceneCharacter : MonoBehaviour
                         int deathNumber = 0;
                         for (int i = 0; i < database.allyDetails.Count; i++)
                         {
-                            if(database.allyDetails[i].GetComponent<Character>().isDead == true)
+                            Character tempCharacter = database.allyDetails[i].GetComponent<Character>();
+                            if (tempCharacter.isDead == true)
                             {
                                 deathNumber++;
                             }
+                            tempCharacter.sceneCharacter.transform.position = new Vector2(-2 + i * -2, -2);
+                            TMPro.TextMeshProUGUI tempHPIndicator = tempCharacter.sceneCharacter.GetComponent<SceneCharacter>().HPIndicatorHolder;
+                            tempHPIndicator.transform.position = tempCharacter.sceneCharacter.transform.position;
+                            tempHPIndicator.transform.position += new Vector3(1, -1.6f, 0);
                         }
                         if (deathNumber == database.allyDetails.Count)
                         {
@@ -140,17 +156,37 @@ public class SceneCharacter : MonoBehaviour
                         int deathNumber = 0;
                         for (int i = 0; i < database.enemyDetails.Count; i++)
                         {
-                            if (database.enemyDetails[i].GetComponent<Character>().isDead == true)
+                            Character tempCharacter = database.enemyDetails[i].GetComponent<Character>();
+                            if (tempCharacter.isDead == true)
                             {
                                 deathNumber++;
                             }
+                            tempCharacter.sceneCharacter.transform.position = new Vector2(2 + i * 2, -2);
+                            TMPro.TextMeshProUGUI tempHPIndicator = tempCharacter.sceneCharacter.GetComponent<SceneCharacter>().HPIndicatorHolder;
+                            tempHPIndicator.transform.position = tempCharacter.sceneCharacter.transform.position;
+                            tempHPIndicator.transform.position += new Vector3(1, -1.6f, 0);
                         }
                         if (deathNumber == database.enemyDetails.Count)
                         {
                             Debug.Log("All Enemies Died.");
                         }
                     }
-                    
+
+                }
+                else
+                {
+                    if (characterStats.isAlly == true)
+                    {
+                        HPIndicatorHolder.text = "HP" + characterStats.currentHP + "\nMP" + characterStats.currentMP;
+                    }
+                    else
+                    {
+                        HPIndicatorHolder.text = "HP" + characterStats.currentHP;
+                    }
+                    if (characterStats.currentHP <= 0)
+                    {
+                        HPIndicatorHolder.text = "Dead";
+                    }
                 }
             }
         }
@@ -180,11 +216,11 @@ public class SceneCharacter : MonoBehaviour
 
     IEnumerator playAnimation()
     {
-        parent.animator.SetBool("isAttack", true);
+        sceneCharacter.animator.SetBool("isAttack", true);
         animator.SetBool("isAttack", true);
         yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).speed);
         repeatRate++;
-        parent.animator.SetBool("isAttack", false);
+        sceneCharacter.animator.SetBool("isAttack", false);
         animator.SetBool("isAttack", false);
         database.isHandling = false;
         progress = 0;
@@ -226,23 +262,42 @@ public class SceneCharacter : MonoBehaviour
     private void performAttackPattern(int ID, int attackID, int index, bool isAlly)
     {
         Character target = getTarget(index, isAlly);
-        if (attackID == -1)
+        int finalAttackDamage = (characterStats.attackDamage + characterStats.extraAttackDamage) - (target.defense + target.extraDefense);
+        if (finalAttackDamage <= 0)
         {
-            target.currentHP -= characterStats.attackDamage;
+            finalAttackDamage = 1;
         }
-        else
+        bool isDodged = false;
+        if (Random.Range(characterStats.dodgeRate + characterStats.extraDodgeRate, 100) == 1)
         {
-            switch (ID)
+            isDodged = true;
+        }
+        if (isDodged == false)
+        {
+            if (attackID == -1)
             {
-                case 0:
-                    if (attackID == 0)
-                    {
-                        target.currentHP -= characterStats.attackDamage;
-                    }
-                    break;
+                characterStats.currentMP += 10;
+                if (characterStats.currentMP > characterStats.maxMP)
+                {
+                    characterStats.currentMP = characterStats.maxMP;
+                }
+                target.currentHP -= finalAttackDamage;
             }
+            else
+            {
+                switch (ID)
+                {
+                    case 0:
+                        if (attackID == 0)
+                        {
+                            target.currentHP -= finalAttackDamage;
+                        }
+                        break;
+                }
+            }
+            target.AddEffect(2, characterStats.element);
+            target.sceneCharacter.isHit();
         }
-        target.sceneCharacter.isHit();
     }
 
     IEnumerator WaitOption()
@@ -262,6 +317,11 @@ public class SceneCharacter : MonoBehaviour
                 break;
             case 2:
                 Debug.Log("Caster: " + database.selector + ", Item: " + database.inventory[database.selectedItem].itemName + ", Is Ally Side: " + database.isAllySelected + ", Target Index: " + database.selectedIndex);
+                database.inventory[database.selectedItem].itemAmount--;
+                if (database.inventory[database.selectedItem].itemAmount <= 0)
+                {
+                    database.inventory.RemoveAt(database.selectedItem);
+                }
                 break;
         }
         StartCoroutine("playAnimation");

@@ -12,14 +12,17 @@ public class SkillMenu : MonoBehaviour
     public GameObject description1, description2;
     private SkillMenu skillMenu;
     private List<Skill> skills;
+    private Character characterStats;
 
 
     private void Start()
     {
         sr = GetComponent<SpriteRenderer>();
         skills = battleMenu.database.allyDetails[battleMenu.database.selector].GetComponent<Character>().skills;
+        sr.sortingOrder = (int)transform.position.z * -1;
         if (isDescription == false)
         {
+            battleMenu.instructionHolder.text = "[W], [Up] and [S], [Down] to scroll, [Z] to comfirm, [X] to cancel";
             description1 = Instantiate(gameObject, transform.position, Quaternion.identity);
             description1.GetComponent<SkillMenu>().isDescription = true;
             description1.GetComponent<SkillMenu>().descriptionID = 0;
@@ -31,6 +34,7 @@ public class SkillMenu : MonoBehaviour
             description2.name = "Page2";
 
             sr.sprite = skillSprites[10];
+            characterStats = battleMenu.database.allyDetails[battleMenu.database.selector].GetComponent<Character>();
         }
         else
         {
@@ -54,6 +58,8 @@ public class SkillMenu : MonoBehaviour
                 transform.position = (Vector2)transform.position + new Vector2(0, -0.75f);
                 sr.color = new Color32(170, 70, 200, 255);
             }
+            transform.position += new Vector3(0, 0, -1);
+
         }
     }
 
@@ -75,6 +81,7 @@ public class SkillMenu : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.X))
             {
+                battleMenu.instructionHolder.text = "[W], [Up] and [S], [Down] to scroll, [Z] to comfirm";
                 battleMenu.isSelectedOption = false;
                 Destroy(gameObject);
             }
@@ -94,9 +101,13 @@ public class SkillMenu : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.Z) && skills.Count != 0)
             {
-                battleMenu.currentItem = skills[scroller].ID;
-                battleMenu.isSelectedItem = true;
-                Destroy(gameObject);
+                if (characterStats.currentMP >= skills[scroller].MPCost)
+                {
+                    characterStats.currentMP -= skills[scroller].MPCost;
+                    battleMenu.currentItem = skills[scroller].ID;
+                    battleMenu.isSelectedItem = true;
+                    Destroy(gameObject);
+                }
             }
         }
     }
