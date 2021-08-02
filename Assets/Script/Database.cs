@@ -84,13 +84,13 @@ public class Database : MonoBehaviour
 
     private void Start()
     {
-        AddCharacterToAllyList(100, 100, 10, 5, 8, 15, Character.Element.wildfire, 0);
+        AddCharacterToAllyList(50, 100, 20, 5, 8, 15, Character.Element.wildfire, 0);
         AddCharacterToAllyList(100, 100, 10, 5, 8, 15, Character.Element.water, 0);
         AddCharacterToAllyList(100, 100, 10, 5, 4, 15, Character.Element.earth, 0);
-        allyDetails[0].GetComponent<Character>().AddSkill(new Skill(Character.Element.wind, 0, 10, "Dodge"));
-        allyDetails[0].GetComponent<Character>().AddSkill(new Skill(Character.Element.wind, 1, 10, "AgainstTheCurrent"));
-        allyDetails[0].GetComponent<Character>().AddSkill(new Skill(Character.Element.fire, 2, 10, "Fireball"));
-        allyDetails[0].GetComponent<Character>().AddSkill(new Skill(Character.Element.fire, 3, 10, "Explosion"));
+        allyDetails[0].GetComponent<Character>().AddSkill(new Skill(Character.Element.wind, 10, "Dodge"));
+        allyDetails[0].GetComponent<Character>().AddSkill(new Skill(Character.Element.wind, 10, "AgainstTheCurrent"));
+        allyDetails[0].GetComponent<Character>().AddSkill(new Skill(Character.Element.fire, 10, "Fireball"));
+        allyDetails[0].GetComponent<Character>().AddSkill(new Skill(Character.Element.fire, 10, "Explosion"));
 
 
         AddCharacterToEnemyList(20, 100, 10, 5, 5, 15, Character.Element.fire, 0);

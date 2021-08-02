@@ -221,7 +221,17 @@ public class BattleMenu : MonoBehaviour
                 }
                 else
                 {
-                    isSelectedTarget = true;
+                    if (database.inventory[currentItem].ID != 4)
+                    {
+                        isSelectedTarget = true;
+                    }
+                    else
+                    {
+                        if (database.allyDetails[currentTarget].GetComponent<Character>().isDead == true)
+                        {
+                            isSelectedTarget = true;
+                        }
+                    }
                 }
             }
             if (Input.GetKeyDown(KeyCode.X) && isSelectedTarget == false)

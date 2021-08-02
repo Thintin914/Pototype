@@ -89,7 +89,7 @@ public class SceneCharacter : MonoBehaviour
                             else
                             {
                                 performAttackPattern(characterStats.ID, getAttackID(characterStats.ID, repeatRate), 0, true);
-                                StartCoroutine("playAnimation");
+                                StartCoroutine("attack");
                             }
                         }
                     }
@@ -214,15 +214,19 @@ public class SceneCharacter : MonoBehaviour
         }
     }
 
-    IEnumerator playAnimation()
+    IEnumerator attack()
     {
         sceneCharacter.animator.SetBool("isAttack", true);
         animator.SetBool("isAttack", true);
-        yield return new WaitForSeconds(animator.GetCurrentAnimatorStateInfo(0).speed);
+        yield return new WaitForSeconds(animator.GetCurrentAnimatorClipInfo(0)[0].clip.length + 0.3f);
         repeatRate++;
         sceneCharacter.animator.SetBool("isAttack", false);
         animator.SetBool("isAttack", false);
         database.isHandling = false;
+        for (int i = 0; i < characterStats.statsEffects.Count; i++)
+        {
+            characterStats.statsEffects[i].FinsihOneRound();
+        }
         progress = 0;
     }
 
@@ -258,18 +262,28 @@ public class SceneCharacter : MonoBehaviour
         }
     }
 
+    private int getOverThread(int current, int addValue, int max = 9999)
+    {
+        if (current + addValue > max)
+        {
+            return max;
+        }
+        if (current + addValue <= 0)
+        {
+            return 1;
+        }
+        return current + addValue;
+    }
     // For Enemy Only, AttackID Sets To -1 = Basic Attack
     private void performAttackPattern(int ID, int attackID, int index, bool isAlly)
     {
         Character target = getTarget(index, isAlly);
-        int finalAttackDamage = (characterStats.attackDamage + characterStats.extraAttackDamage) - (target.defense + target.extraDefense);
-        if (finalAttackDamage <= 0)
-        {
-            finalAttackDamage = 1;
-        }
+        int finalDamage = getOverThread(characterStats.attackDamage, characterStats.extraAttackDamage - (target.defense + target.extraDefense));
         bool isDodged = false;
-        if (Random.Range(characterStats.dodgeRate + characterStats.extraDodgeRate, 100) == 1)
+
+        if (Random.Range(getOverThread(target.dodgeRate, target.extraDodgeRate, 100), 100) == getOverThread(target.dodgeRate , target.extraDodgeRate, 100))
         {
+            Debug.Log("Dodged");
             isDodged = true;
         }
         if (isDodged == false)
@@ -281,7 +295,7 @@ public class SceneCharacter : MonoBehaviour
                 {
                     characterStats.currentMP = characterStats.maxMP;
                 }
-                target.currentHP -= finalAttackDamage;
+                target.currentHP -= finalDamage;
             }
             else
             {
@@ -290,7 +304,7 @@ public class SceneCharacter : MonoBehaviour
                     case 0:
                         if (attackID == 0)
                         {
-                            target.currentHP -= finalAttackDamage;
+                            target.currentHP -= finalDamage;
                         }
                         break;
                 }
@@ -307,16 +321,96 @@ public class SceneCharacter : MonoBehaviour
         battleMenu.Show();
         yield return new WaitUntil(() => database.isSelectedOption == true);
         database.isSelectedOption = false;
+        Character target = getTarget(database.selectedIndex, database.isAllySelected);
+        int finalDamage = 0;
         switch (database.selectedState)
         {
             case 0:
                 performAttackPattern(0, -1, database.selectedIndex, false);
                 break;
             case 1:
-                Debug.Log("Caster: " + database.selector + ", Skill: " + database.allyDetails[database.selector].GetComponent<Character>().skills[database.selectedItem].skillName + ", Is Ally Side: " + database.isAllySelected + ", Target Index: " + database.selectedIndex);
+                Debug.Log("Caster: " + database.selector + ", Skill: " + database.allyDetails[database.selector].GetComponent<Character>().skills[database.selectedItem].ID + ", Is Ally Side: " + database.isAllySelected + ", Target Index: " + database.selectedIndex);
+                switch (database.allyDetails[database.selector].GetComponent<Character>().skills[database.selectedItem].ID)
+                {
+                    case 0:
+                        target.AddStatsEffect(2, 0, 100, 0, 0);
+                        break;
+                    case 1:
+                        target.AddStatsEffect(1, 0, 0, -3, 0);
+                        target.AddEffect(2, Character.Element.wind);
+                        break;
+                    case 2:
+                        finalDamage = getOverThread(characterStats.attackDamage, characterStats.extraAttackDamage - (target.defense + target.extraDefense));
+                        finalDamage += (int)(finalDamage * 0.15f);
+                        target.currentHP -= finalDamage;
+                        target.AddEffect(2, Character.Element.fire);
+                        break;
+                    case 3:
+                        finalDamage = getOverThread(characterStats.attackDamage, characterStats.extraAttackDamage - (target.defense + target.extraDefense));
+                        finalDamage += (int)(finalDamage * 0.05f);
+                        for (int i = 0; i < database.enemyDetails.Count; i++)
+                        {
+                            database.enemyDetails[i].GetComponent<Character>().currentHP -= finalDamage;
+                            database.enemyDetails[i].GetComponent<Character>().AddEffect(2, Character.Element.fire);
+                        }
+                        break;
+                    case 4:
+                        target.currentHP = target.maxHP;
+                        break;
+                    case 5:
+                        finalDamage = getOverThread(characterStats.attackDamage, characterStats.extraAttackDamage - (target.defense + target.extraDefense));
+                        finalDamage = (int)(finalDamage * 0.7f);
+                        for (int i = 0; i < database.enemyDetails.Count; i++)
+                        {
+                            database.enemyDetails[i].GetComponent<Character>().currentHP -= finalDamage;
+                            database.enemyDetails[i].GetComponent<Character>().AddEffect(2, Character.Element.water);
+                        }
+                        break;
+                    case 6:
+                        target.shieldPoint += 50;
+                        break;
+                    case 7:
+                        for (int i = 0; i < database.allyDetails.Count; i++)
+                        {
+                            database.allyDetails[i].GetComponent<Character>().shieldPoint += 30;
+                        }
+                        break;
+                    case 8:
+                        target.currentHP -= getOverThread(characterStats.attackDamage, characterStats.extraAttackDamage - (target.defense + target.extraDefense));
+                        target.AddStatsEffect(2, 0, 0, 6, 0);
+                        target.AddEffect(2, Character.Element.electricity);
+                        break;
+                    case 9:
+                        characterStats.currentHP -= (int)(characterStats.currentHP * 0.9f);
+                        finalDamage = getOverThread(characterStats.attackDamage, characterStats.extraAttackDamage - (target.defense + target.extraDefense));
+                        finalDamage += (int)(finalDamage * 1.5f);
+                        target.AddEffect(2, Character.Element.electricity);
+                        break;
+                }
                 break;
             case 2:
                 Debug.Log("Caster: " + database.selector + ", Item: " + database.inventory[database.selectedItem].itemName + ", Is Ally Side: " + database.isAllySelected + ", Target Index: " + database.selectedIndex);
+                switch (database.inventory[database.selectedItem].ID)
+                {
+                    case 0:
+                        target.currentHP = getOverThread(target.currentHP, 50, target.maxHP);
+
+                        break;
+                    case 1:
+                        target.currentMP = getOverThread(target.currentMP, 30, target.maxHP);
+                        break;
+                    case 2:
+                        target.AddStatsEffect(3, 0, 0, 3, 0);
+                        break;
+                    case 3:
+                        target.AddStatsEffect(3, 0, 0, 0, 25);
+                        break;
+                    case 4:
+                        target.isDead = false;
+                        target.currentHP = getOverThread(target.currentHP, 50, target.maxHP);
+                        target.sceneCharacter.isHit();
+                        break;
+                }
                 database.inventory[database.selectedItem].itemAmount--;
                 if (database.inventory[database.selectedItem].itemAmount <= 0)
                 {
@@ -324,6 +418,6 @@ public class SceneCharacter : MonoBehaviour
                 }
                 break;
         }
-        StartCoroutine("playAnimation");
+        StartCoroutine("attack");
     }
 }

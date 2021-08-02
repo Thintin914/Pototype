@@ -5,7 +5,7 @@ using UnityEngine;
 public class Character : MonoBehaviour
 {
     public int maxHP, currentHP, maxMP, currentMP, defense, dodgeRate, speed, attackDamage, ID;
-    public int extraDefense, extraDodgeRate, extraSpeed, extraAttackDamage;
+    public int extraDefense, extraDodgeRate, extraSpeed, extraAttackDamage, shieldPoint;
     public enum Element {none, fire, water, wind, earth, electricity, ice, rain, stone, wildfire, chaos};
     public Element element;
     public bool isAlly, isDead = false;
@@ -14,6 +14,7 @@ public class Character : MonoBehaviour
     public GameObject elementPrefab;
     public List<GameObject> effects;
     public GameObject textPrefab;
+    public List<StatsEffect> statsEffects;
 
     public void SetCharacter(int maxHP, int maxMP, int defense, int dodgeRate, int speed, int attackDamage, Element element, int ID)
     {
@@ -42,5 +43,10 @@ public class Character : MonoBehaviour
             temp.GetComponent<ElementEffect>().setValue(round, element, this);
             effects.Add(temp);
         }
+    }
+
+    public void AddStatsEffect(int round, int extraDefense, int extraDodgeRate, int extraSpeed, int extraAttackDamage)
+    {
+        statsEffects.Add(new StatsEffect(round, this, extraDefense, extraDodgeRate, extraSpeed, extraAttackDamage));
     }
 }

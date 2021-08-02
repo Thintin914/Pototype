@@ -8,10 +8,9 @@ public class ElementEffect : MonoBehaviour
     public int round;
     public Character characterStats;
     public Sprite[] elementImages;
-    public SceneCharacter sc;
     public TMPro.TextMeshProUGUI roundIndicatorHolder;
 
-    private int initialRepeatRate, previousRepeatRate, extraDefense = 0, extraDodgeRate = 0, extraSpeed = 0, extraAttackDamage = 0;
+    private int previousRepeatRate, extraDefense = 0, extraDodgeRate = 0, extraSpeed = 0, extraAttackDamage = 0;
     private SpriteRenderer sr;
     private bool isDeleted = false, isDeleteUp = false;
 
@@ -50,7 +49,6 @@ public class ElementEffect : MonoBehaviour
         this.round = round;
         this.element = element;
         this.characterStats = characterStats;
-        sc = characterStats.sceneCharacter.GetComponent<SceneCharacter>();
         sr = GetComponent<SpriteRenderer>();
 
         for (int i = 0; i < characterStats.effects.Count; i++)
@@ -81,8 +79,7 @@ public class ElementEffect : MonoBehaviour
         }
 
         sr.sprite = elementImages[getSpriteIndex(this.element)];
-        initialRepeatRate = sc.barCharacter.repeatRate;
-        previousRepeatRate = sc.barCharacter.repeatRate;
+        previousRepeatRate = characterStats.sceneCharacter.barCharacter.repeatRate;
         roundIndicatorHolder = Instantiate(characterStats.textPrefab).GetComponent<TMPro.TextMeshProUGUI>();
         roundIndicatorHolder.text = round.ToString();
         roundIndicatorHolder.transform.SetParent(GameObject.Find("Canvas").transform);
@@ -194,7 +191,9 @@ public class ElementEffect : MonoBehaviour
                 extraSpeed -= 4;
                 break;
             case Character.Element.stone:
-                characterStats.sceneCharacter.barCharacter.progress -= 10;
+                characterStats.sceneCharacter.barCharacter.progress = -10 * round;
+                round = 0;
+                roundIndicatorHolder.text = "0";
                 break;
             case Character.Element.wildfire:
                 if (characterStats.isAlly == true)
@@ -239,7 +238,6 @@ public class ElementEffect : MonoBehaviour
         {
             transform.position = characterStats.sceneCharacter.transform.position;
             transform.position += new Vector3(1, characterStats.effects.IndexOf(gameObject), 0);
-            roundIndicatorHolder.text = round.ToString();
             if (roundIndicatorHolder != null)
             {
                 roundIndicatorHolder.transform.position = transform.position;
@@ -250,10 +248,11 @@ public class ElementEffect : MonoBehaviour
                     isDeleted = true;
                     StartCoroutine("SlideDelete");
             }
-            if (previousRepeatRate != sc.barCharacter.repeatRate)
+            if (previousRepeatRate != characterStats.sceneCharacter.barCharacter.repeatRate)
             {
                 round--;
-                previousRepeatRate = sc.barCharacter.repeatRate;
+                roundIndicatorHolder.text = round.ToString();
+                previousRepeatRate = characterStats.sceneCharacter.barCharacter.repeatRate;
                 executeEffects();
             }
         }
